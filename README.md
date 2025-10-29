@@ -1,10 +1,6 @@
 # Modular Code Review System
 
-A flexible, composable code review framework that adapts to your needs. Mix and match modules for efficient, targeted reviews.
-
-**🎯 35% more token-efficient than monolithic prompts while catching 20% more security issues.**
-
-> Based on real-world testing: Modular approach found 3 P1 vulnerabilities vs 2 P1 for monolithic, using 18K tokens vs 28K tokens.
+A flexible, composable code review framework for Claude Code. Mix and match security and performance modules to create targeted reviews that fit your needs.
 
 ---
 
@@ -29,91 +25,25 @@ A flexible, composable code review framework that adapts to your needs. Mix and 
 
 ---
 
-## 🚀 How to Use This Repository
+## 🚀 How to Use
 
-### Option 1: With Claude Code (Recommended)
+### With Claude Code
 
-1. **Clone or download** this repository
-2. **Navigate to your project directory**
-3. **Compose modules** based on your needs (see examples below)
-4. **Feed to Claude Code:**
+1. **Clone this repository** next to your project or in a central location
+2. **Compose modules** based on your review needs (see Quick Start below)
+3. **Feed to Claude Code:**
 
 ```bash
-# In your project root
+# In your project directory
 cat path/to/code-review-modules/core/00_overview.md \
     path/to/code-review-modules/core/02_authentication_authorization.md \
     path/to/code-review-modules/specialized/multi_tenant_rls.md
 ```
 
-Then tell Claude:
+Then tell Claude Code:
 ```
 "Review my codebase using the methodology above. Focus on RLS policies and authentication."
 ```
-
-### Option 2: With Claude API
-
-```python
-import anthropic
-
-# Read modules
-with open('core/00_overview.md') as f:
-    overview = f.read()
-with open('specialized/multi_tenant_rls.md') as f:
-    rls = f.read()
-
-# Combine into prompt
-prompt = f"""
-{overview}
-
-{rls}
-
-Now review this codebase following the methodology above.
-Focus on multi-tenant security.
-
-Codebase files:
-[paste your code or reference files]
-"""
-
-client = anthropic.Anthropic(api_key="your-key")
-response = client.messages.create(
-    model="claude-sonnet-4-5-20250929",
-    max_tokens=100000,
-    messages=[{"role": "user", "content": prompt}]
-)
-```
-
-### Option 3: Copy-Paste to Claude.ai
-
-1. **Compose modules** using `cat` command (see Quick Start)
-2. **Copy output** to clipboard
-3. **Paste into Claude.ai** chat
-4. **Add instruction:** "Review my codebase using this methodology. Here are the key files: [paste files or describe codebase]"
-
----
-
-## 📊 Token Usage
-
-| Module Type | Token Range | Use Case |
-|-------------|-------------|----------|
-| **Core** | 2-4K each | Essential security & architecture |
-| **Specialized** | 2-4K each | Deep dives on specific topics |
-| **Tech Stacks** | 2-4K each | Framework-specific patterns |
-| **Checklists** | 0.8-1K each | Quick scans |
-
-**Example Combinations:**
-- Quick security scan: 5-8K tokens (1 core + 1-2 specialized)
-- Full security audit: 15-20K tokens (all core + relevant specialized)
-- Performance review: 8-12K tokens (core basics + advanced modules)
-- Tech-specific review: 10-15K tokens (core + tech stack + specialized)
-
-**Token Budget Calculator:**
-
-| Your Available Tokens | Recommended Approach |
-|-----------------------|----------------------|
-| < 10K | Use checklists only |
-| 10-20K | Core modules + 1-2 specialized |
-| 20-30K | Full security OR performance suite |
-| 30K+ | Comprehensive (core + specialized + tech) |
 
 ---
 
@@ -131,7 +61,6 @@ cat core/00_overview.md \
     core/04_api_security.md \
     tech_stacks/[your-stack].md
 ```
-**Tokens:** ~15K
 **Finds:** Authentication issues, injection vulnerabilities, API security gaps
 **Best for:** Pre-launch security audit, compliance checks
 </details>
@@ -146,7 +75,6 @@ cat core/00_overview.md \
     specialized/ssrf_bola.md \
     tech_stacks/nuxt_supabase.md
 ```
-**Tokens:** ~18K
 **Finds:** RLS policy issues, BOLA/IDOR vulnerabilities, tenant isolation gaps
 **Best for:** Multi-tenant applications, SaaS platforms
 </details>
@@ -160,9 +88,8 @@ cat core/00_overview.md \
     specialized/ai_security.md \
     specialized/strategic_caching.md
 ```
-**Tokens:** ~14K
 **Finds:** Prompt injection, data poisoning, cost optimization
-**Best for:** Apps using OpenAI, Anthropic, or other LLM APIs
+**Best for:** Apps using LLM APIs
 </details>
 
 <details>
@@ -174,7 +101,6 @@ cat core/00_overview.md \
     specialized/strategic_caching.md \
     specialized/advanced_indexing.md
 ```
-**Tokens:** ~14K
 **Finds:** N+1 queries, missing indexes, caching opportunities
 **Best for:** Slow applications, high database costs
 </details>
@@ -186,7 +112,6 @@ cat core/00_overview.md \
 cat checklists/security_quick.md \
     checklists/performance_quick.md
 ```
-**Tokens:** ~2K
 **Finds:** Critical P0/P1 issues only
 **Best for:** Daily PR reviews, pre-commit checks
 </details>
@@ -198,17 +123,14 @@ cat checklists/security_quick.md \
 # Generate combined prompt
 cat [modules above] > /tmp/review-prompt.md
 
-# Open in editor and copy
-open /tmp/review-prompt.md
+# Copy to clipboard
+cat /tmp/review-prompt.md | pbcopy  # macOS
+cat /tmp/review-prompt.md | xclip   # Linux
+
+# Paste into Claude Code and ask for review
 ```
 
-**Method 2: Pipe to Claude Code**
-```bash
-# If using Claude Code CLI
-cat [modules above] | claude-code review .
-```
-
-**Method 3: Save as Project Template**
+**Method 2: Save as Project Template**
 ```bash
 # Save your common combination
 echo "cat core/00_overview.md \\" > .code-review.sh
@@ -271,25 +193,25 @@ START: What's your primary goal?
 ```
 code-review-modules/
 ├── README.md                          # This file
-├── core/                              # Tech-agnostic fundamentals (~16K tokens total)
+├── core/                              # Tech-agnostic fundamentals
 │   ├── 00_overview.md                 # ⭐ START HERE - Methodology & severity definitions
 │   ├── 01_reconnaissance.md           # Architecture mapping (optional)
 │   ├── 02_authentication_authorization.md  # Auth, sessions, RBAC, BOLA/IDOR
 │   ├── 03_input_validation.md         # SQL injection, XSS, command injection
 │   ├── 04_api_security.md             # Rate limiting, CORS, headers
 │   └── 05_performance_basics.md       # N+1 queries, indexing, caching basics
-├── specialized/                       # Deep dives (~17K tokens total)
+├── specialized/                       # Deep dive modules
 │   ├── multi_tenant_rls.md           # ⭐ Row-Level Security for multi-tenant apps
 │   ├── ai_security.md                # ⭐ Prompt injection, data poisoning
 │   ├── ssrf_bola.md                  # SSRF, BOLA/IDOR, webhook security
 │   ├── command_injection_redos.md    # Command injection, ReDoS
 │   ├── strategic_caching.md          # Multi-layer caching strategies
 │   └── advanced_indexing.md          # Database optimization
-├── tech_stacks/                      # Framework-specific (~6K tokens total)
+├── tech_stacks/                      # Framework-specific patterns
 │   ├── nuxt_supabase.md             # Nuxt 3/4 + Supabase patterns
 │   ├── nextjs_vercel.md             # Next.js 13-15 + Vercel patterns
 │   └── template.md                  # Template for creating new stacks
-└── checklists/                       # Quick reference (~2K tokens total)
+└── checklists/                       # Quick reference checklists
     ├── security_quick.md            # P0/P1 security checklist
     └── performance_quick.md         # Quick performance wins
 ```
@@ -309,7 +231,6 @@ code-review-modules/
 cat checklists/security_quick.md \
     checklists/performance_quick.md
 ```
-**Tokens:** ~2K
 **Time:** 5 minutes
 **Focus:** Critical issues only
 </details>
@@ -323,7 +244,6 @@ cat core/00_overview.md \
     core/04_api_security.md \
     tech_stacks/[your-stack].md
 ```
-**Tokens:** ~12K
 **Time:** 15-20 minutes
 **Focus:** Security + framework patterns
 </details>
@@ -339,7 +259,6 @@ cat core/00_overview.md \
     core/05_performance_basics.md \
     tech_stacks/[your-stack].md
 ```
-**Tokens:** ~18K
 **Time:** 30-40 minutes
 **Focus:** Comprehensive security + performance
 </details>
@@ -352,7 +271,6 @@ cat core/*.md \
     specialized/*.md \
     tech_stacks/[your-stack].md
 ```
-**Tokens:** ~35K
 **Time:** 1-2 hours
 **Focus:** Everything
 </details>
@@ -397,35 +315,6 @@ cat core/00_overview.md \
     specialized/strategic_caching.md \
     specialized/advanced_indexing.md
 ```
-
----
-
-## 💡 Real-World Results
-
-### What We Found in Testing
-
-**Test Setup:**
-- Codebase: Multi-tenant SaaS (Nuxt + Supabase)
-- Modules Used: 8 modules (~18K tokens)
-- Comparison: vs 28K token monolithic prompt
-
-**Findings:**
-
-| Issue | Severity | Caught by Modular? | Caught by Monolithic? |
-|-------|----------|-------------------|----------------------|
-| Missing Rate Limiting | P1 | ✅ Yes | ✅ Yes |
-| Missing Caching | P1 | ✅ Yes | ✅ Yes |
-| Webhook SSRF Risk | P1 | ✅ Yes | ❌ No |
-| Security Headers | P2 | ✅ Yes | ❌ No |
-| Database Indexes | P2 | ✅ Yes | ✅ Yes |
-
-**Results:**
-- ✅ **Found 50% more P1 issues** (3 vs 2)
-- ✅ **Used 35% fewer tokens** (18K vs 28K)
-- ✅ **Better coverage** (93% vs 79% of security areas)
-- ✅ **More actionable** (checklist format, specific file references)
-
-[See full comparison report](./docs/comparison-report.md) *(if you include it in the repo)*
 
 ---
 
@@ -513,136 +402,6 @@ cat core/00_overview.md \
 
 ---
 
-## 🚀 Integration Examples
-
-### GitHub Actions
-
-```yaml
-name: Security Review
-on:
-  pull_request:
-    branches: [main, develop]
-
-jobs:
-  security-review:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download Code Review Modules
-        run: |
-          git clone https://github.com/yourusername/code-review-modules.git
-
-      - name: Run Security Quick Check
-        uses: anthropics/claude-code-action@v1
-        with:
-          prompt: |
-            $(cat code-review-modules/checklists/security_quick.md)
-
-            Review the changed files in this PR for security issues.
-          files: ${{ github.event.pull_request.changed_files }}
-          api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-```
-
-### Pre-commit Hook
-
-```bash
-#!/bin/bash
-# .git/hooks/pre-commit
-
-# Quick security check on staged files
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|js|vue|py)$')
-
-if [ -n "$STAGED_FILES" ]; then
-  echo "🔍 Running security quick check..."
-
-  # Combine checklist with staged files
-  cat code-review-modules/checklists/security_quick.md > /tmp/review-prompt.md
-  echo -e "\n\n## Files to Review:\n" >> /tmp/review-prompt.md
-
-  for file in $STAGED_FILES; do
-    echo "### $file" >> /tmp/review-prompt.md
-    cat "$file" >> /tmp/review-prompt.md
-  done
-
-  # Send to Claude (requires claude-code CLI)
-  claude-code review /tmp/review-prompt.md
-
-  # Ask user to confirm
-  read -p "Continue with commit? (y/n) " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    exit 1
-  fi
-fi
-```
-
-### VS Code Task
-
-```json
-// .vscode/tasks.json
-{
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Code Review - Security",
-      "type": "shell",
-      "command": "cat code-review-modules/core/00_overview.md code-review-modules/core/02_authentication_authorization.md code-review-modules/core/03_input_validation.md | pbcopy && echo 'Review prompt copied to clipboard!'",
-      "problemMatcher": []
-    },
-    {
-      "label": "Code Review - Performance",
-      "type": "shell",
-      "command": "cat code-review-modules/core/00_overview.md code-review-modules/core/05_performance_basics.md code-review-modules/specialized/strategic_caching.md | pbcopy && echo 'Review prompt copied to clipboard!'",
-      "problemMatcher": []
-    }
-  ]
-}
-```
-
----
-
-## 📈 Metrics & Tracking
-
-### Track Module Effectiveness
-
-Create a simple log to see which modules find the most issues:
-
-```bash
-# Run reviews with logging
-review_with_log() {
-  MODULE=$1
-  echo "=== Reviewing with $MODULE ===" | tee -a review-log.txt
-  cat "code-review-modules/$MODULE" | claude-code review . 2>&1 | tee -a review-log.txt
-}
-
-# Review with different modules
-review_with_log "specialized/multi_tenant_rls.md"
-review_with_log "specialized/ai_security.md"
-
-# Analyze results
-grep -c "P0" review-log.txt
-grep -c "P1" review-log.txt
-```
-
-### Coverage Matrix
-
-Track which modules you've applied:
-
-```markdown
-# Project: My SaaS App
-## Review Coverage
-
-| Module | Last Review | Findings | Status |
-|--------|-------------|----------|--------|
-| multi_tenant_rls | 2025-01-15 | 0 P0, 1 P1 | ✅ Fixed |
-| ai_security | 2025-01-20 | 0 P0, 0 P1 | ✅ Clean |
-| ssrf_bola | Never | - | ⏳ Pending |
-| strategic_caching | 2025-01-10 | 2 P2 | 🔧 In Progress |
-```
-
----
-
 ## 🆘 FAQ
 
 <details>
@@ -669,11 +428,11 @@ Track which modules you've applied:
 
 **A:** Start with the quick checklist!
 
-**Day 1:** `checklists/security_quick.md` (~800 tokens, 5 minutes)
+**Day 1:** `checklists/security_quick.md` (5 minutes)
 - Gets you 80% of critical issues
 - Builds muscle memory for what to check
 
-**Week 1:** Add `core/02` and `core/03` (~6K tokens, 20 minutes)
+**Week 1:** Add `core/02` and `core/03` (20 minutes)
 - Covers authentication and input validation
 - Most common vulnerability sources
 
@@ -716,20 +475,17 @@ Track which modules you've applied:
 </details>
 
 <details>
-<summary><b>Q: What if I hit Claude's token limit?</b></summary>
+<summary><b>Q: What if I need a quicker review?</b></summary>
 
-**A:** You have several options:
+**A:** Use fewer modules or just the checklists:
 
-1. **Use checklists only** (~2K tokens) - covers P0/P1
+1. **Use checklists only** - covers critical P0/P1 issues
 2. **Review in chunks** - Run different modules on different days
 3. **Focus on changed files** - Only review what's new
-4. **Create condensed versions** - Extract just the checklists from each module
 
-**Example - Condensed Review:**
+**Quick Review Example:**
 ```bash
-# Extract just the checklist sections
-grep -A 50 "Checklist" core/02_authentication_authorization.md
-grep -A 50 "Checklist" core/03_input_validation.md
+cat checklists/security_quick.md
 ```
 </details>
 
@@ -941,7 +697,7 @@ cat core/00_overview.md my_project_rls.md
    - Review findings: What did you miss?
    - Team feedback: What takes longest to review manually?
 
-2. **Create focused module** (2-4K tokens)
+2. **Create focused module**
    ```bash
    cp specialized/template.md specialized/my_new_module.md
    ```
@@ -982,12 +738,11 @@ cat core/00_overview.md my_project_rls.md
 2. **Create your module:**
    - Use `tech_stacks/template.md` as starting point
    - Follow format of existing modules
-   - Keep focused (2-4K tokens)
+   - Keep focused and concise
 3. **Test it** on real code
 4. **Submit PR** with:
    - Description of what it covers
    - Example usage
-   - Token estimate
 
 **Most wanted contributions:**
 - [ ] Payment security module (Stripe, PayPal)
@@ -1007,72 +762,6 @@ cat core/00_overview.md my_project_rls.md
 4. **Provide Context:** Brief explanation of why it matters
 5. **Set Severity:** Use P0/P1/P2/P3 consistently
 6. **Stay Tech-Agnostic:** (for core modules only)
-
----
-
-## 📊 Performance Comparison
-
-Based on real-world testing vs monolithic 28K token prompt:
-
-| Metric | Modular | Monolithic | Winner |
-|--------|---------|------------|--------|
-| **Token Usage** | 18K | 28K | 🏆 Modular (35% smaller) |
-| **P1 Findings** | 3 | 2 | 🏆 Modular (+50%) |
-| **Coverage** | 93% | 79% | 🏆 Modular (+14%) |
-| **Actionability** | High (checklist) | Medium (narrative) | 🏆 Modular |
-| **Flexibility** | ∞ combinations | 1 fixed path | 🏆 Modular |
-| **Learning Curve** | Medium | Easy | 🏆 Monolithic |
-
-**Recommendation:**
-- Use **Modular** for most reviews (better results, more efficient)
-- Use **Monolithic** for first-time comprehensive audits and training
-
----
-
-## 🏆 Success Stories
-
-### Case Study 1: Multi-Tenant SaaS
-
-**Before Review:**
-- No rate limiting
-- Missing caching layer
-- Webhook SSRF vulnerability
-
-**Modules Used:**
-```bash
-cat specialized/multi_tenant_rls.md \
-    specialized/ssrf_bola.md \
-    specialized/strategic_caching.md
-```
-
-**Results:**
-- ✅ Found 3 P1 issues
-- ✅ Prevented potential SSRF attack
-- ✅ Identified 50-100x performance improvement opportunity
-
-**Time:** 30 minutes
-**ROI:** Prevented security breach + 90% cost reduction via caching
-
-### Case Study 2: AI Application
-
-**Before Review:**
-- Prompt injection vulnerable
-- No output validation
-- User could poison prompt templates
-
-**Modules Used:**
-```bash
-cat specialized/ai_security.md \
-    core/03_input_validation.md
-```
-
-**Results:**
-- ✅ Comprehensive prompt sanitization added
-- ✅ Output validation implemented
-- ✅ Template security locked down
-
-**Time:** 20 minutes
-**ROI:** Prevented prompt injection attacks
 
 ---
 
@@ -1109,12 +798,9 @@ cat specialized/ai_security.md \
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-01-28
-**Tested On:** Multi-tenant SaaS (Nuxt + Supabase)
-**Token Efficiency:** 35% better than monolithic
-**Issue Detection:** 20% more P1 findings
-**Flexibility:** ∞ combinations
+## 📄 License
+
+MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
