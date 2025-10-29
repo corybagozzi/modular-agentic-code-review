@@ -2,6 +2,8 @@
 
 A flexible, composable code review framework for Claude Code. Mix and match security and performance modules to create targeted reviews that fit your needs.
 
+**📚 [See real-world examples →](./examples/)**
+
 ---
 
 ## ⚡ Quick Answer: "What if my tech stack isn't here?"
